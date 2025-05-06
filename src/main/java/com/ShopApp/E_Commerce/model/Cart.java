@@ -30,7 +30,7 @@ public class Cart {
     }
 
     public void removeItem(CartItem cartItem) {
-        this.removeItem(cartItem);
+        this.cartItems.remove(cartItem);
         cartItem.setCart(null);
         updateTotalAmount();
     }
