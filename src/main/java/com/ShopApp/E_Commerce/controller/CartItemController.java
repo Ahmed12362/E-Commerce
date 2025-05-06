@@ -3,6 +3,8 @@ package com.ShopApp.E_Commerce.controller;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.service.cart.ICartItemService;
+import com.ShopApp.E_Commerce.service.cart.ICartService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +15,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${api.prefix}/cartItems")
 public class CartItemController {
     private final ICartItemService cartItemService;
+    private final ICartService cartService;
 
     @PostMapping("/item/add")
     public ResponseEntity<ApiResponse> addItemToCart(
-            @RequestParam Long cartId,
+            @RequestParam(required = false) Long cartId,
             @RequestParam Long productId,
             @RequestParam int quantity) {
         try {
+            if (cartId == null) {
+                cartId = cartService.initializeNewCart();
+            }
             cartItemService.addItemToCart(cartId, productId, quantity);
             return ResponseEntity.ok(new ApiResponse("Item Added Successfully!", null));
         } catch (Exception e) {
@@ -28,7 +34,7 @@ public class CartItemController {
         }
     }
 
-    @DeleteMapping("/cart/{cartId}/item/itemId}/remove")
+    @DeleteMapping("/cart/{cartId}/item/{itemId}/remove")
     public ResponseEntity<ApiResponse> removeItemFromCart(@PathVariable Long cartId, @PathVariable Long itemId) {
         try {
             cartItemService.removeItemFromCart(cartId, itemId);
@@ -38,7 +44,8 @@ public class CartItemController {
                     .body(new ApiResponse(e.getMessage(), null));
         }
     }
-@PutMapping("/cart/{cartId}/item/{productId}/update")
+
+    @PutMapping("/cart/{cartId}/item/{productId}/update")
     public ResponseEntity<ApiResponse> updateItemQuantity(
             @PathVariable Long cartId,
             @PathVariable Long productId,
