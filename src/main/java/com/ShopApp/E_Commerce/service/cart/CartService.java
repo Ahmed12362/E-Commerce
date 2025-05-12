@@ -6,6 +6,7 @@ import com.ShopApp.E_Commerce.repository.CartItemRepository;
 import com.ShopApp.E_Commerce.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +28,7 @@ public class CartService implements ICartService {
     }
 
     @Override
+    @Transactional
     public void clearCart(Long id) {
         Cart cart = getCart(id);
         cartItemRepository.deleteAllByCartId(id);
@@ -47,5 +49,10 @@ public class CartService implements ICartService {
 //        Long newCartId = cartIdGenerator.incrementAndGet();
 //        newCart.setId(newCartId);
         return cartRepository.save(newCart).getId();
+    }
+
+    @Override
+    public Cart getCartByUserId(Long userId) {
+       return cartRepository.findByUserId(userId);
     }
 }
