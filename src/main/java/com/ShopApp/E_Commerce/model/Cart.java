@@ -1,5 +1,7 @@
 package com.ShopApp.E_Commerce.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +22,13 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private BigDecimal totalAmount = BigDecimal.ZERO;
+
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<CartItem> cartItems = new HashSet<>();
+    @OneToOne
+    @JoinColumn
+    private User user;
 
     public void addItem(CartItem cartItem) {
         this.cartItems.add(cartItem);

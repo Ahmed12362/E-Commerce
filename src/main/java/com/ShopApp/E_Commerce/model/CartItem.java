@@ -1,5 +1,8 @@
 package com.ShopApp.E_Commerce.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +30,8 @@ public class CartItem {
 
     @ManyToOne() //cacade. all!!
     @JoinColumn
+    @JsonBackReference
+//    @JsonIgnore // for Infinite Json Loop
     private Cart cart;
 
     public void setTotalPrice(){
