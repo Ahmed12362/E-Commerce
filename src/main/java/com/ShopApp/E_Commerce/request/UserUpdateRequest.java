@@ -1,5 +1,9 @@
 package com.ShopApp.E_Commerce.request;
 
-public class UserUpdateRequest {
+import lombok.Data;
 
+@Data
+public class UserUpdateRequest {
+    private String firstName;
+    private String lastName;
 }
