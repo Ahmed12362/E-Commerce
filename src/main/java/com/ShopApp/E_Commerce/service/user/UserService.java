@@ -1,5 +1,6 @@
 package com.ShopApp.E_Commerce.service.user;
 
+import com.ShopApp.E_Commerce.exceptions.AlreadyExistException;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.User;
 import com.ShopApp.E_Commerce.repository.UserRepository;
@@ -35,7 +36,7 @@ public class UserService implements IUserService {
                     user.setPassword(request.getPassword());
                     return userRepository.save(user);
                 })
-                .orElseThrow(()->new ResourceNotFoundException(request.getEmail()+" already exists!"));
+                .orElseThrow(()->new AlreadyExistException(request.getEmail()+" already exists!"));
     }
 
     @Override
