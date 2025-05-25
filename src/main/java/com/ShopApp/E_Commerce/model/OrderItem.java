@@ -1,5 +1,6 @@
 package com.ShopApp.E_Commerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class OrderItem {
     private Long id;
     private int quantity;
     private BigDecimal price;
-
+    
     @ManyToOne
     @JoinColumn
     private Order order;

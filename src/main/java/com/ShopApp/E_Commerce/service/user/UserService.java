@@ -1,8 +1,11 @@
 package com.ShopApp.E_Commerce.service.user;
 
+import com.ShopApp.E_Commerce.dto.OrderDto;
+import com.ShopApp.E_Commerce.dto.OrderItemDto;
 import com.ShopApp.E_Commerce.dto.UserDto;
 import com.ShopApp.E_Commerce.exceptions.AlreadyExistException;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
+import com.ShopApp.E_Commerce.model.Order;
 import com.ShopApp.E_Commerce.model.User;
 import com.ShopApp.E_Commerce.repository.UserRepository;
 import com.ShopApp.E_Commerce.request.CreateUserRequest;
@@ -11,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -60,8 +64,42 @@ public class UserService implements IUserService {
                     throw new ResourceNotFoundException("User Not Found");
                 });
     }
+
+    //Convert Manually From User To User Dto
     @Override
     public UserDto convertUserToDto(User user){
-       return  modelMapper.map(user , UserDto.class);
+        UserDto userDto = modelMapper.map(user , UserDto.class);
+
+        // Manual mapping for orders
+        List<OrderDto> orderDtos = user.getOrder().stream().map(order -> {
+            OrderDto orderDto = new OrderDto();
+            orderDto.setId(order.getOrderId());
+            orderDto.setUserId(user.getUserId());
+            orderDto.setOrderDate(order.getOrderDate());
+            orderDto.setOrderStatus(order.getOrderStatus().toString());
+            orderDto.setTotalAmount(order.getTotalAmount());
+
+            // Map order items
+            List<OrderItemDto> items = order.getOrderItems().stream().map(orderItem -> {
+                OrderItemDto dto = new OrderItemDto();
+                dto.setProductId(orderItem.getProduct().getId());
+                dto.setProductName(orderItem.getProduct().getName());
+                dto.setProductBrand(orderItem.getProduct().getBrand());
+                dto.setPrice(orderItem.getPrice());
+                dto.setQuantity(orderItem.getQuantity());
+                return dto;
+            }).toList();
+
+            orderDto.setItems(items);
+            return orderDto;
+        }).toList();
+
+        userDto.setOrders(orderDtos);
+
+        return userDto;
     }
+
+//    public UserDto convertUserToDto(User user){
+//       return  modelMapper.map(user , UserDto.class);
+//    }
 }
