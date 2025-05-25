@@ -28,6 +28,7 @@ public class Cart {
     private Set<CartItem> cartItems = new HashSet<>();
     @OneToOne
     @JoinColumn
+    @JsonBackReference
     private User user;
 
     public void addItem(CartItem cartItem) {

@@ -2,6 +2,7 @@ package com.ShopApp.E_Commerce.service.cart;
 
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Cart;
+import com.ShopApp.E_Commerce.model.User;
 import com.ShopApp.E_Commerce.repository.CartItemRepository;
 import com.ShopApp.E_Commerce.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,15 +45,17 @@ public class CartService implements ICartService {
 //                .map(CartItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     @Override
-    public Long initializeNewCart(){
-        Cart newCart = new Cart();
-//        Long newCartId = cartIdGenerator.incrementAndGet();
-//        newCart.setId(newCartId);
-        return cartRepository.save(newCart).getId();
+    public Cart initializeNewCart(User user){
+       return Optional.ofNullable(getCartByUserId(user.getUserId()))
+               .orElseGet(()-> {
+                   Cart cart = new Cart();
+                   cart.setUser(user);
+                   return cartRepository.save(cart);
+               });
     }
 
     @Override
     public Cart getCartByUserId(Long userId) {
-       return cartRepository.findByUserId(userId);
+       return cartRepository.findByUserUserId(userId);
     }
 }
