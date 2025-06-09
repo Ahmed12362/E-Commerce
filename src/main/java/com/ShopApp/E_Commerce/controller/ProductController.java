@@ -1,6 +1,7 @@
 package com.ShopApp.E_Commerce.controller;
 
 import com.ShopApp.E_Commerce.dto.ProductDto;
+import com.ShopApp.E_Commerce.exceptions.AlreadyExistException;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Product;
 import com.ShopApp.E_Commerce.request.AddProductRequest;
@@ -47,8 +48,8 @@ public class ProductController {
         try {
             Product theProduct = productService.addProduct(request);
             return ResponseEntity.ok(new ApiResponse("Added Success!", theProduct));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        } catch (AlreadyExistException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new ApiResponse(e.getMessage() , null));
         }
     }

@@ -2,6 +2,7 @@ package com.ShopApp.E_Commerce.service.product;
 
 import com.ShopApp.E_Commerce.dto.ImageDto;
 import com.ShopApp.E_Commerce.dto.ProductDto;
+import com.ShopApp.E_Commerce.exceptions.AlreadyExistException;
 import com.ShopApp.E_Commerce.exceptions.ProductNotFoundException;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Category;
@@ -26,8 +27,9 @@ public class ProductService implements IProductService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
     private final ImageRepository imageRepository;
+
     @Autowired
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository , ModelMapper modelMapper , ImageRepository imageRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ModelMapper modelMapper, ImageRepository imageRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
@@ -36,12 +38,22 @@ public class ProductService implements IProductService {
 
     @Override
     public Product addProduct(AddProductRequest request) {
+
+        if(productExistsByNameAndBrand(request.getName() , request.getBrand())){
+            throw new AlreadyExistException(request.getBrand() +" "+ request.getName() +" Already Exists *(You Can Update This Product)");
+        }
+
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
                     Category newCategory = new Category(request.getCategory().getName());
                     return categoryRepository.save(newCategory);
                 });
         return productRepository.save(createProduct(request, category));
+    }
+
+
+    private boolean productExistsByNameAndBrand(String name, String brand) {
+        return productRepository.existsByNameAndBrand(name, brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category) {
@@ -123,16 +135,18 @@ public class ProductService implements IProductService {
     public Long countProductByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
     }
+
     @Override
-    public List<ProductDto> getConvertedProducts(List<Product> products){
+    public List<ProductDto> getConvertedProducts(List<Product> products) {
         return products.stream().map(this::convertToProductDto).toList();
     }
+
     @Override
-    public ProductDto convertToProductDto(Product product){
-        ProductDto productDto = modelMapper.map(product , ProductDto.class);
+    public ProductDto convertToProductDto(Product product) {
+        ProductDto productDto = modelMapper.map(product, ProductDto.class);
         List<Image> images = imageRepository.findByProductId(product.getId());
         List<ImageDto> imageDtos = images.stream()
-                .map(image -> modelMapper.map(image , ImageDto.class)).toList();
+                .map(image -> modelMapper.map(image, ImageDto.class)).toList();
         productDto.setImages(imageDtos);
         return productDto;
     }
