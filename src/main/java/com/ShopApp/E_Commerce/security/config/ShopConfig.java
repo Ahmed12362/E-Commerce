@@ -1,4 +1,4 @@
-package com.ShopApp.E_Commerce.config;
+package com.ShopApp.E_Commerce.security.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
