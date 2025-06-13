@@ -5,7 +5,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.validation.Valid;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -23,6 +23,16 @@ public class JwtUtils {
 
     @Value("${auth.token.expirationInMils}")
     private int expirationTime;
+
+
+    //for debugging
+    @PostConstruct
+    public void init() {
+        if (jwtSecret == null || jwtSecret.isEmpty()) {
+            throw new IllegalStateException("jwtSecret is null or empty! Check application.properties for auth.token.jwtSecret");
+        }
+        System.out.println("JwtUtils initialized. jwtSecret: " + jwtSecret + ", expirationTime: " + expirationTime);
+    }
     public String generateTokenForUser(Authentication authentication){
         ShopUserDetails userPrinciple =(ShopUserDetails) authentication.getPrincipal();
 
