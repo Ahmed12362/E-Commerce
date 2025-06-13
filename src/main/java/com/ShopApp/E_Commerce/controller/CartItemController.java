@@ -7,6 +7,7 @@ import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.service.cart.ICartItemService;
 import com.ShopApp.E_Commerce.service.cart.ICartService;
 import com.ShopApp.E_Commerce.service.user.IUserService;
+import io.jsonwebtoken.JwtException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,12 +27,16 @@ public class CartItemController {
             @RequestParam Long productId,
             @RequestParam int quantity) {
         try {
-            User user = userService.getUserById(1L);
+            User user = userService.getAuthenticatedUser();
                Cart cart = cartService.initializeNewCart(user);
             cartItemService.addItemToCart(cart.getId(), productId, quantity);
             return ResponseEntity.ok(new ApiResponse("Item Added Successfully!", null));
-        } catch (Exception e) {
+        }catch (ResourceNotFoundException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(e.getMessage(), null));
+        }
+        catch (JwtException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse(e.getMessage(), null));
         }
     }
