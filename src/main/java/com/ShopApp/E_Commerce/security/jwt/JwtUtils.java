@@ -18,8 +18,8 @@ import java.util.List;
 
 @Component
 public class JwtUtils {
-    @Value("${auth.token.jwtSecret}")
-    private String jwtSecret;
+//    @Value("${auth.token.jwtSecret}")
+    private static final String jwtSecret = "uTo9u1mYV2zK3Rj8lWq4fN7bSm9tGx6cPjZrQeThWkEzLyVxBpDnHoAtCvMsUyZq";
 
     @Value("${auth.token.expirationInMils}")
     private int expirationTime;
@@ -28,11 +28,10 @@ public class JwtUtils {
     //for debugging
     @PostConstruct
     public void init() {
-        if (jwtSecret == null || jwtSecret.isEmpty()) {
-            throw new IllegalStateException("jwtSecret is null or empty! Check application.properties for auth.token.jwtSecret");
-        }
+        System.out.println("JwtUtils initialized. jwtSecret: " + jwtSecret);
         System.out.println("JwtUtils initialized. jwtSecret: " + jwtSecret + ", expirationTime: " + expirationTime);
     }
+    //end debugging
     public String generateTokenForUser(Authentication authentication){
         ShopUserDetails userPrinciple =(ShopUserDetails) authentication.getPrincipal();
 
@@ -49,7 +48,7 @@ public class JwtUtils {
                 .compact();
     }
     private Key key(){
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
     public String getUserNameFromToken(String token){
        return Jwts.parserBuilder()

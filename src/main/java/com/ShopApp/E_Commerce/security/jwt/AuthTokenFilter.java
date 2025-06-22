@@ -32,10 +32,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         try {
             String token = parseJwt(request);
             if(StringUtils.hasText(token) && jwtUtils.validateToken(token)){
+                System.out.println("Token is valid");
                 String username = jwtUtils.getUserNameFromToken(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                 var auth = new UsernamePasswordAuthenticationToken(userDetails , null , userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
+            }
+            else {
+                System.out.println("Token is invalid");
             }
         } catch (JwtException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -50,6 +54,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
     private String parseJwt(HttpServletRequest request){
         String authHeader = request.getHeader("Authorization");
+        System.out.println("Auth Header: " + authHeader);
         if(StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")){
             return authHeader.substring(7);
         }

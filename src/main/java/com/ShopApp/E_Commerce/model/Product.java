@@ -1,8 +1,6 @@
 package com.ShopApp.E_Commerce.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,7 +9,6 @@ import java.math.BigDecimal;
 import java.util.List;
 @Getter
 @Setter
-
 @NoArgsConstructor
 @Entity
 public class Product {
@@ -23,7 +20,7 @@ public class Product {
     private BigDecimal price;
     private int inventory;
     private String description;
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "category_id")
     private Category category;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL , orphanRemoval = true)

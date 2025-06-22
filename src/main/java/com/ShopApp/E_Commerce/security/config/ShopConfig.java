@@ -1,5 +1,6 @@
 package com.ShopApp.E_Commerce.security.config;
 
+import com.ShopApp.E_Commerce.exceptions.CustomAccessDenied;
 import com.ShopApp.E_Commerce.security.jwt.AuthTokenFilter;
 import com.ShopApp.E_Commerce.security.jwt.JwtAuthEntryPoint;
 import com.ShopApp.E_Commerce.security.jwt.JwtUtils;
@@ -30,6 +31,7 @@ import java.util.List;
 public class ShopConfig {
     private final ShopUserDetailsService shopUserDetailsService;
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final CustomAccessDenied customAccessDenied;
     private static final List<String> SECURED_URLS = List.of("/api/v1/carts/**" , "/api/v1/cartItems/**");
 
     @Bean
@@ -63,7 +65,10 @@ public class ShopConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)throws Exception{
         http.csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception->exception.authenticationEntryPoint(jwtAuthEntryPoint))
+                .exceptionHandling(exception->exception.authenticationEntryPoint(jwtAuthEntryPoint)
+                        .accessDeniedHandler(customAccessDenied)
+                )
+
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->auth.requestMatchers(SECURED_URLS.toArray(String[]::new)).authenticated()
                         .anyRequest().permitAll());
