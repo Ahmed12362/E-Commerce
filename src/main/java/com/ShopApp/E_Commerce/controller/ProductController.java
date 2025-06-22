@@ -99,11 +99,12 @@ public class ProductController {
     public ResponseEntity<ApiResponse> getProductByCategoryAndName(@RequestParam String category ,@RequestParam String name)  {
         try {
             List<Product> theProduct = productService.getProductByCategoryAndBrand(category , name);
-            List<ProductDto> productDtos = productService.getConvertedProducts(theProduct);
             if(theProduct.isEmpty()){
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)
                         .body(new ApiResponse("No product found with name: "+name , null));
             }
+
+            List<ProductDto> productDtos = productService.getConvertedProducts(theProduct);
             return ResponseEntity.ok(new ApiResponse("Found!", productDtos));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
