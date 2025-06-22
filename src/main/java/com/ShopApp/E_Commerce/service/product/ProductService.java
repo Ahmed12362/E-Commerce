@@ -75,7 +75,7 @@ public class ProductService implements IProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Product not found!"));
     }
 
-    public Product updateExistingProduct(Product existingProduct, UpdateProductRequest request) {
+    private Product updateExistingProduct(Product existingProduct, UpdateProductRequest request) {
         existingProduct.setName(request.getName());
         existingProduct.setBrand(request.getBrand());
         existingProduct.setPrice(request.getPrice());
