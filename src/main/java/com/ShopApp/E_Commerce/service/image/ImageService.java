@@ -46,18 +46,31 @@ public class ImageService implements IImageService {
                 image.setFileType(file.getContentType());
                 image.setImage(new SerialBlob(file.getBytes()));
                 image.setProduct(product);
-                String buildDownloadUrl = "/api/v1/images/image/download/";
-                String downloadUrl = buildDownloadUrl + image.getId();
-                image.setDownloadUrl(downloadUrl);
-                Image savedImaged = imageRepository.save(image);
-                savedImaged.setDownloadUrl(buildDownloadUrl + savedImaged.getId());
-                imageRepository.save(savedImaged);
-                ImageDto imageDto= new ImageDto();
-                imageDto.setImageName(savedImaged.getFileName());
-                imageDto.setImageId(savedImaged.getId());
-                imageDto.setDownloadUrl(savedImaged.getDownloadUrl());
 
+                Image savedImage = imageRepository.save(image);
+
+                String downloadUrl = "/api/v1/images/image/download/" + savedImage.getId();
+                savedImage.setDownloadUrl(downloadUrl);
+                savedImage = imageRepository.save(savedImage);
+
+                ImageDto imageDto = new ImageDto();
+                imageDto.setImageName(savedImage.getFileName());
+                imageDto.setImageId(savedImage.getId());
+                imageDto.setDownloadUrl(savedImage.getDownloadUrl());
                 imageDtos.add(imageDto);
+
+//                String buildDownloadUrl = "/api/v1/images/image/download/";
+//                String downloadUrl = buildDownloadUrl + image.getId();
+//                image.setDownloadUrl(downloadUrl);
+//                Image savedImaged = imageRepository.save(image);
+//                savedImaged.setDownloadUrl(buildDownloadUrl + savedImaged.getId());
+//                imageRepository.save(savedImaged);
+//                ImageDto imageDto= new ImageDto();
+//                imageDto.setImageName(savedImaged.getFileName());
+//                imageDto.setImageId(savedImaged.getId());
+//                imageDto.setDownloadUrl(savedImaged.getDownloadUrl());
+//
+//                imageDtos.add(imageDto);
             } catch (IOException | SQLException e) {
                 throw new RuntimeException(e.getMessage());
             }
@@ -70,7 +83,7 @@ public class ImageService implements IImageService {
         Image image = getImageById(image_id);
         try {
             image.setFileName(file.getOriginalFilename());
-            image.setFileName(file.getOriginalFilename());
+            image.setFileType(file.getContentType());
             image.setImage(new SerialBlob(file.getBytes()));
             imageRepository.save(image);
             return image;
