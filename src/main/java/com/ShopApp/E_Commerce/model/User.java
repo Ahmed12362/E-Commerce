@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.aspectj.weaver.ast.Or;
 import org.hibernate.annotations.NaturalId;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +35,7 @@ public class User {
     private Cart cart;
 
     @OneToMany(mappedBy = "user" , cascade = CascadeType.ALL , orphanRemoval = true)
-    private List<Order> order;
+    private List<Order> order = new ArrayList<>();
 
     @ManyToMany(
             fetch = FetchType.EAGER,
