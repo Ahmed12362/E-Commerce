@@ -9,6 +9,7 @@ import com.ShopApp.E_Commerce.request.UpdateProductRequest;
 import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.service.product.IProductService;
 import com.ShopApp.E_Commerce.service.product.ProductService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +47,7 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("add")
-    public ResponseEntity<ApiResponse> addProduct(@RequestBody AddProductRequest request) {
+    public ResponseEntity<ApiResponse> addProduct(@RequestBody @Valid AddProductRequest request) {
         try {
             Product theProduct = productService.addProduct(request);
             return ResponseEntity.ok(new ApiResponse("Added Success!", theProduct));

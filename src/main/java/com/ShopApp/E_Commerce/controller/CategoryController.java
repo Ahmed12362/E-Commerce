@@ -4,6 +4,7 @@ import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Category;
 import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.service.category.ICategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -31,7 +32,7 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addCategory(@RequestBody Category category) {
+    public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid Category category) {
         try {
             Category theCategory = categoryService.addCategory(category);
             return ResponseEntity.ok(new ApiResponse("Added Success", theCategory));
@@ -75,7 +76,7 @@ public class CategoryController {
     }
 
     @PutMapping("category/{id}/update")
-    public ResponseEntity<ApiResponse> updateCategory(@PathVariable long id, @RequestBody Category category) {
+    public ResponseEntity<ApiResponse> updateCategory(@PathVariable long id, @RequestBody @Valid Category category) {
         try {
             Category updateCategory = categoryService.updateCategory(category, id);
             return ResponseEntity.ok(new ApiResponse("Updated Success", updateCategory));
