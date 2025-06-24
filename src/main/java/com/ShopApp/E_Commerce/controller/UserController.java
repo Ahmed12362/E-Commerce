@@ -9,6 +9,7 @@ import com.ShopApp.E_Commerce.request.UserUpdateRequest;
 import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.service.user.IUserService;
 import com.ShopApp.E_Commerce.service.user.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<ApiResponse> createUser(@RequestBody @Valid CreateUserRequest request) {
         try {
             User user = userService.creatUser(request);
             UserDto userDto = userService.convertUserToDto(user);
