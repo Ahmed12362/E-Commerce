@@ -22,9 +22,9 @@ public class OrderController {
 
     @PostMapping("/order")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApiResponse> createOrder(@RequestParam Long user_id) {
+    public ResponseEntity<ApiResponse> createOrder() {
         try {
-            Order order = orderService.placeOrder(user_id);
+            Order order = orderService.placeOrder();
             OrderDto orderDto = orderService.convertToDto(order);
             return ResponseEntity.ok(new ApiResponse("Order Success!", orderDto));
         } catch (Exception e) {
