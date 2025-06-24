@@ -3,13 +3,11 @@ package com.ShopApp.E_Commerce.service.order;
 import com.ShopApp.E_Commerce.dto.OrderDto;
 import com.ShopApp.E_Commerce.enums.OrderStatus;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
-import com.ShopApp.E_Commerce.model.Cart;
-import com.ShopApp.E_Commerce.model.Order;
-import com.ShopApp.E_Commerce.model.OrderItem;
-import com.ShopApp.E_Commerce.model.Product;
+import com.ShopApp.E_Commerce.model.*;
 import com.ShopApp.E_Commerce.repository.OrderRepository;
 import com.ShopApp.E_Commerce.repository.ProductRepository;
 import com.ShopApp.E_Commerce.service.cart.ICartService;
+import com.ShopApp.E_Commerce.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -26,10 +24,12 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final ICartService cartService;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     @Override
-    public Order placeOrder(Long userId) {
-        Cart cart = cartService.getCartByUserId(userId);
+    public Order placeOrder() {
+        User user = userService.getAuthenticatedUser();
+        Cart cart = cartService.getCartByUserId(user.getUserId());
         Order order = createOrder(cart);
         List<OrderItem> orderItemList = createOrderItems(order, cart);
         order.setOrderItems(new HashSet<>(orderItemList));

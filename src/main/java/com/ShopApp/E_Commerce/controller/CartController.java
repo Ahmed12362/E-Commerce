@@ -1,5 +1,6 @@
 package com.ShopApp.E_Commerce.controller;
 
+import com.ShopApp.E_Commerce.dto.CartDto;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Cart;
 import com.ShopApp.E_Commerce.response.ApiResponse;
@@ -23,7 +24,8 @@ public class CartController {
     public ResponseEntity<ApiResponse> getCart(@PathVariable Long cartId) {
         try {
             Cart cart = cartService.getCart(cartId);
-            return ResponseEntity.ok(new ApiResponse("Success", cart));
+            CartDto cartDto = cartService.convertCartToDto(cart);
+            return ResponseEntity.ok(new ApiResponse("Success", cartDto));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(), null));
@@ -41,6 +43,17 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse(e.getMessage(), null));
         }
+    }
+    @GetMapping("/my-cart")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<ApiResponse> getUserCart(){
+            Cart cart = cartService.getCartUser();
+            if(cart == null){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiResponse("User didn't have cart yet" , "Can't get cart"));
+            }
+            CartDto cartDto = cartService.convertCartToDto(cart);
+            return ResponseEntity.ok(new ApiResponse("Found!" , cartDto));
     }
 
     @GetMapping("/{cartId}/cart/total-price")

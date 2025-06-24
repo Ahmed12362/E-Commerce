@@ -22,6 +22,7 @@ public class ShopUserDetails implements UserDetails {
     private String password;
     private Collection<GrantedAuthority> authorities;
 
+    private User user;
     public static ShopUserDetails buildUserDetails(User user){
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
@@ -30,7 +31,8 @@ public class ShopUserDetails implements UserDetails {
                 user.getUserId(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities
+                authorities,
+                user
         );
     }
 

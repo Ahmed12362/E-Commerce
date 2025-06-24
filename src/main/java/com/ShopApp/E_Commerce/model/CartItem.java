@@ -28,7 +28,7 @@ public class CartItem {
     @JoinColumn
     private Product product;
 
-    @ManyToOne() //cacade. all!!
+    @ManyToOne(fetch = FetchType.EAGER) //cacade. all!!
     @JoinColumn
     @JsonBackReference
 //    @JsonIgnore // for Infinite Json Loop

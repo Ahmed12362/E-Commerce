@@ -11,6 +11,7 @@ import com.ShopApp.E_Commerce.repository.RoleRepository;
 import com.ShopApp.E_Commerce.repository.UserRepository;
 import com.ShopApp.E_Commerce.request.CreateUserRequest;
 import com.ShopApp.E_Commerce.request.UserUpdateRequest;
+import com.ShopApp.E_Commerce.security.user.ShopUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -132,7 +133,14 @@ public class UserService implements IUserService {
 
     @Override
     public User getAuthenticatedUser() {
-        return (User) SecurityContextHolder.getContext().getAuthentication();
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof ShopUserDetails userDetails) {
+            return userDetails.getUser();
+        }
+
+        throw new RuntimeException("User not authenticated");
     }
+
 
 }

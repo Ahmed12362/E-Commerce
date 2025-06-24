@@ -1,5 +1,6 @@
 package com.ShopApp.E_Commerce.service.cart;
 
+import com.ShopApp.E_Commerce.dto.CartDto;
 import com.ShopApp.E_Commerce.model.Cart;
 import com.ShopApp.E_Commerce.model.User;
 
@@ -12,5 +13,9 @@ public interface ICartService {
 
     Cart initializeNewCart(User user);
 
+    Cart getCartUser();
+
     Cart getCartByUserId(Long userId);
+
+    CartDto convertCartToDto(Cart cart);
 }
