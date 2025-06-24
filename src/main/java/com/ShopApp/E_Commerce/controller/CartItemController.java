@@ -12,6 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class CartItemController {
     private final IUserService userService;
 
     @PostMapping("/item/add")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ApiResponse> addItemToCart(
             @RequestParam Long productId,
             @RequestParam int quantity) {
@@ -40,7 +42,7 @@ public class CartItemController {
                     .body(new ApiResponse(e.getMessage(), null));
         }
     }
-
+    @PreAuthorize("hasRole('ROLE_USER')")
     @DeleteMapping("/cart/{cartId}/item/{itemId}/remove")
     public ResponseEntity<ApiResponse> removeItemFromCart(@PathVariable Long cartId, @PathVariable Long itemId) {
         try {
@@ -52,6 +54,7 @@ public class CartItemController {
         }
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @PutMapping("/cart/{cartId}/item/{productId}/update")
     public ResponseEntity<ApiResponse> updateItemQuantity(
             @PathVariable Long cartId,

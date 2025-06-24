@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class CategoryController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> addCategory(@RequestBody @Valid Category category) {
         try {
             Category theCategory = categoryService.addCategory(category);
@@ -65,6 +67,7 @@ public class CategoryController {
     }
 
     @DeleteMapping("/category/{id}/delete")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> deleteCategory(@PathVariable long id) {
         try {
             categoryService.deleteCategoryById(id);
@@ -76,6 +79,7 @@ public class CategoryController {
     }
 
     @PutMapping("category/{id}/update")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse> updateCategory(@PathVariable long id, @RequestBody @Valid Category category) {
         try {
             Category updateCategory = categoryService.updateCategory(category, id);
