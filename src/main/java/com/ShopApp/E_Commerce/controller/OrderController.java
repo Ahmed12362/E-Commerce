@@ -9,6 +9,7 @@ import com.ShopApp.E_Commerce.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class OrderController {
     private final IOrderService orderService;
 
     @PostMapping("/order")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ApiResponse> createOrder(@RequestParam Long user_id) {
         try {
             Order order = orderService.placeOrder(user_id);
@@ -40,8 +42,8 @@ public class OrderController {
                     .body(new ApiResponse("Error Occur", e.getMessage()));
         }
     }
+    @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping("/{userId}/orders")
-
     public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Long userId) {
         try {
             List<OrderDto> order = orderService.getUserOrders(userId);

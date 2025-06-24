@@ -9,6 +9,9 @@ import lombok.Lombok;
 public interface IUserService {
     User getUserById(Long userId);
     User creatUser(CreateUserRequest request);
+
+    User creatAdmin(CreateUserRequest request);
+
     User updateUser(UserUpdateRequest request , Long userId);
     void deleteUser(Long userId);
 
