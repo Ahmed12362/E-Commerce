@@ -4,6 +4,7 @@ import com.ShopApp.E_Commerce.dto.OrderDto;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Order;
 import com.ShopApp.E_Commerce.response.ApiResponse;
+import com.ShopApp.E_Commerce.response.StripeResponse;
 import com.ShopApp.E_Commerce.service.order.IOrderService;
 import com.ShopApp.E_Commerce.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,10 @@ public class OrderController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<ApiResponse> createOrder() {
         try {
-            Order order = orderService.placeOrder();
-            OrderDto orderDto = orderService.convertToDto(order);
-            return ResponseEntity.ok(new ApiResponse("Order Success!", orderDto));
+            StripeResponse stripeResponse = orderService.placeOrder();
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse("Checkout Success" , stripeResponse));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse("Error Occur", e.getMessage()));

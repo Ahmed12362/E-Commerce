@@ -38,6 +38,7 @@ public class CartService implements ICartService {
         Cart cart = getCart(id);
         cartItemRepository.deleteAllByCartId(id);
         cart.getCartItems().clear();
+        cart.updateTotalAmount();
         cartRepository.deleteById(id);
     }
 

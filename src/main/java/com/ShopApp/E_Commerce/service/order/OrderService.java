@@ -6,6 +6,7 @@ import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.*;
 import com.ShopApp.E_Commerce.repository.OrderRepository;
 import com.ShopApp.E_Commerce.repository.ProductRepository;
+import com.ShopApp.E_Commerce.response.StripeResponse;
 import com.ShopApp.E_Commerce.service.cart.ICartService;
 import com.ShopApp.E_Commerce.service.user.UserService;
 import com.lowagie.text.*;
@@ -13,8 +14,13 @@ import com.lowagie.text.Font;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -33,8 +39,11 @@ public class OrderService implements IOrderService {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
+    @Value("${stripe.secretKey}")
+    private String secretKey;
+
     @Override
-    public Order placeOrder() {
+    public StripeResponse placeOrder() throws StripeException {
         User user = userService.getAuthenticatedUser();
         Cart cart = cartService.getCartByUserId(user.getUserId());
         Order order = createOrder(cart);
@@ -42,8 +51,58 @@ public class OrderService implements IOrderService {
         order.setOrderItems(new HashSet<>(orderItemList));
         order.setTotalAmount(calculateTotalAmount(orderItemList));
         Order savedOrder = orderRepository.save(order);
+        Stripe.apiKey = secretKey;
+//        cart.getCartItems().stream()
+//                        .map(cartItem -> {
+//                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
+//                                    .setName(cartItem.getProduct().getName())
+//                                    .build();
+//                            return cartItem;
+//                        });
+        List<SessionCreateParams.LineItem> lineItems = order.getOrderItems().stream()
+                .map(orderItem -> SessionCreateParams.LineItem.builder()
+                        .setQuantity((long) orderItem.getQuantity())
+                        .setPriceData(
+                                SessionCreateParams.LineItem.PriceData.builder()
+                                        .setCurrency("egp")
+                                        .setUnitAmount(orderItem.getPrice().multiply(BigDecimal.valueOf(100)).longValue())
+                                        .setProductData(
+                                                SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                        .setName(orderItem.getProduct().getName())
+                                                        .build()
+                                        )
+                                        .build()
+                        )
+                        .build())
+                .toList();
+
+//        order.getOrderItems().stream()
+//                .map(orderItem -> {
+//                    SessionCreateParams.LineItem.builder()
+//                            .setQuantity( (long)orderItem.getQuantity())
+//                            .setPriceData()
+//                            .build();
+//                    return orderItem;
+//                });
+        SessionCreateParams params = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl("http://localhost:8081/success")
+                .setCancelUrl("http://localhost:8081/cancel")
+                .addAllLineItem(lineItems)
+                .build();
+        SessionCreateParams.builder()
+                        .setMode(SessionCreateParams.Mode.PAYMENT);
+        Session session = Session.create(params);
+
+
+
         cartService.clearCart(cart.getId());
-        return savedOrder;
+        return StripeResponse.builder()
+                .status("SUCCESS")
+                .message("Payment Session Created Successfully")
+                .sessionId(session.getId())
+                .sessionUrl(session.getUrl())
+                .build();
     }
 
     private Order createOrder(Cart cart) {
