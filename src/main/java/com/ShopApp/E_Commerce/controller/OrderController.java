@@ -7,8 +7,7 @@ import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.service.order.IOrderService;
 import com.ShopApp.E_Commerce.service.order.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,14 +42,44 @@ public class OrderController {
         }
     }
     @PreAuthorize("hasRole('ROLE_USER')")
-    @GetMapping("/{userId}/orders")
-    public ResponseEntity<ApiResponse> getUserOrders(@PathVariable Long userId) {
+    @GetMapping("my-orders")
+    public ResponseEntity<ApiResponse> getUserOrders() {
         try {
-            List<OrderDto> order = orderService.getUserOrders(userId);
+            List<OrderDto> order = orderService.getUserOrders();
             return ResponseEntity.ok(new ApiResponse("Loaded!", order));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse("Error Occur", e.getMessage()));
         }
     }
+
+    @GetMapping("/{orderId}/download")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<byte[]> downloadOrderPdf(@PathVariable Long orderId) {
+        try {
+            Order order = orderService.getOrderById(orderId);
+            Long currentUserId = orderService.getAuthenticatedUserId();
+
+            if (!order.getUser().getUserId().equals(currentUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(null);
+            }
+
+            byte[] pdf = orderService.generateOrderPdf(order);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition
+                    .inline()
+                    .filename("order_" + orderId + ".pdf")
+                    .build());
+
+            return new ResponseEntity<>(pdf, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+
 }
