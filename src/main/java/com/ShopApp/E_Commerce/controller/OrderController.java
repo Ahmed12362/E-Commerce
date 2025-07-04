@@ -1,8 +1,10 @@
 package com.ShopApp.E_Commerce.controller;
 
 import com.ShopApp.E_Commerce.dto.OrderDto;
+import com.ShopApp.E_Commerce.enums.OrderStatus;
 import com.ShopApp.E_Commerce.exceptions.ResourceNotFoundException;
 import com.ShopApp.E_Commerce.model.Order;
+import com.ShopApp.E_Commerce.repository.OrderRepository;
 import com.ShopApp.E_Commerce.response.ApiResponse;
 import com.ShopApp.E_Commerce.response.StripeResponse;
 import com.ShopApp.E_Commerce.service.order.IOrderService;
@@ -25,7 +27,7 @@ public class OrderController {
     public ResponseEntity<ApiResponse> createOrder() {
         try {
             StripeResponse stripeResponse = orderService.placeOrder();
-
+            Order order = orderService.getOrderById(orderService.getAuthenticatedUserId());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new ApiResponse("Checkout Success" , stripeResponse));
         } catch (Exception e) {
