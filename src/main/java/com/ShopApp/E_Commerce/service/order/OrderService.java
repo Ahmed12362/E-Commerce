@@ -51,7 +51,7 @@ public class OrderService implements IOrderService {
         order.setOrderItems(new HashSet<>(orderItemList));
         order.setTotalAmount(calculateTotalAmount(orderItemList));
         Order savedOrder = orderRepository.save(order);
-        Stripe.apiKey = secretKey;
+//        Stripe.apiKey = secretKey;
 //        cart.getCartItems().stream()
 //                        .map(cartItem -> {
 //                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
